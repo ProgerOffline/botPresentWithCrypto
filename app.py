@@ -2,10 +2,12 @@
 
 from aiogram import executor
 from loader import dp
+from database import create_db
 
 
 async def on_startup(dp):
     import middlewares, handlers
+    await create_db()
 
 
 if __name__ == "__main__":
