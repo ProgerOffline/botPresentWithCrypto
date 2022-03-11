@@ -1,22 +1,17 @@
 # -*- coding: utf-8 -*-
 
 from aiogram import types
+from loader import _
 
 
-def authorization(exist):
-    """
-    Возвращает одну кнопку входа, если пользователь есть в базе
-    То текст будет "Войти", если нет в базе тогда "Регистрация"
-    agrs:
-        in_base - Наличие пользователя в базе
-    """
-    if exist:     
+def authorization(if_exist):
+    if if_exist:
         return types.ReplyKeyboardMarkup(
             resize_keyboard=True,
             row_width=1,
         ).add(
             types.KeyboardButton(
-                text="Войти",
+                text=_("Войти"),
                 request_contact=True,
             ),
         )
@@ -26,7 +21,7 @@ def authorization(exist):
             row_width=1,
         ).add(
             types.KeyboardButton(
-                text="Регистрация",
+                text=_("Регистрация"),
                 request_contact=True,
             ),
         )
@@ -37,21 +32,59 @@ def main_menu():
         resize_keyboard=True,
         row_width=1,
     ).row(
-        types.KeyboardButton(text="Мой Баланс"),
-        types.KeyboardButton(text="Пополнить баланс"),
+        types.KeyboardButton(text=_("Мой Баланс")),
+        types.KeyboardButton(text=_("Пополнить баланс")),
     ).row(
-        types.KeyboardButton(text="Реферальная программа"),
-        types.KeyboardButton(text="Кошелек для вывода"),
+        types.KeyboardButton(text=_("Реферальная программа")),
+        types.KeyboardButton(text=_("Кошелек для вывода")),
     ).row(
-        types.KeyboardButton(text="Мои инвестиции"),
-        types.KeyboardButton(text="Инвестиционный продукт"),
+        types.KeyboardButton(text=_("Мои инвестиции")),
+        types.KeyboardButton(text=_("Инвестиционный продукт")),
     ).row(
-        types.KeyboardButton(text="Вывод средств"),
-        types.KeyboardButton(text="Вывод тела депозита"),
+        types.KeyboardButton(text=_("Вывод средств")),
+        types.KeyboardButton(text=_("Вывод тела депозита")),
     ).row(
-        types.KeyboardButton(text="Профиль"),
-        types.KeyboardButton(text="Поддержка"),
+        types.KeyboardButton(text=_("Профиль")),
+        types.KeyboardButton(text=_("Поддержка")),
     ).row(
-        types.KeyboardButton(text="Выход"),
+        types.KeyboardButton(text=_("Выход")),
     )
 
+
+def back_to_menu():
+    return types.ReplyKeyboardMarkup(
+        resize_keyboard=True,
+        row_width=1,
+    ).add(
+        types.KeyboardButton(
+            text=_("Назад"),
+        )
+    )
+
+
+def buy_invest():
+    return types.ReplyKeyboardMarkup(
+        resize_keyboard=True,
+        row_width=1,
+    ).row(
+        types.KeyboardButton(
+            text=_("Купить"),
+        ),
+        types.KeyboardButton(
+            text=_("Назад"),
+        )
+    )
+
+
+def confirm_buy():
+    return types.ReplyKeyboardMarkup(
+        resize_keyboard=True,
+        row_width=1,
+    ).add(
+        types.KeyboardButton(
+            text=_("Подтвердить покупку"),
+        ),
+        types.KeyboardButton(
+            text=_("Назад"),
+        )
+    )

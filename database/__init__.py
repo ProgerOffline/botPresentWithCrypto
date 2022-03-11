@@ -2,7 +2,6 @@
 
 from data.config import DB_HOST, DB_USER, DB_PASS
 from .models import db
-from . import account_api
 
 
 async def create_db():
