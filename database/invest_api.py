@@ -33,3 +33,8 @@ async def get_invest_record(invest_id: int):
     ) .gino.first()
 
     return record
+
+
+async def delete_record(invest_id: int):
+    record = await get_invest_record(invest_id)
+    await record.delete()

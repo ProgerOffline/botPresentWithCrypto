@@ -21,11 +21,31 @@ async def back_to_menu(message: types.Message, state: FSMContext):
 
 @dp.message_handler(text=_("Подтвердить"), state=OutInvest.confirm_out)
 async def confirm_out(message: types.Message, state: FSMContext):
-    async with state.proxy as data:
+    async with state.proxy() as data:
         record_id = data['record_id']
+        finished = data['finished']
 
     record = await invest_api.get_invest_record(record_id)
-    print(record)
+    account = await account_api.get_account(message.from_user.id)
+
+    if finished:
+        amount = record.amount + (record.amount / 100 * record.count_precent)
+    else:
+        amount = record.amount + (record.amount / 100 * (record.count_precent) - 20)
+
+    await account_api.update_ballance(
+        user_id=account.user_id,
+        new_amount=account.ballance + amount,
+    )
+
+    await invest_api.delete_record(record_id)
+
+    await state.finish()
+    await message.answer(
+        text=_("✅ Средства поступили на ваш баланс. "),
+        reply_markup=reply.main_menu(),
+    )
+
 
 @dp.message_handler(state=BuyInvest.get_amount)
 async def get_amount_invest(message: types.Message, state: FSMContext):
@@ -62,7 +82,7 @@ async def get_amount_invest(message: types.Message, state: FSMContext):
         reply_markup=reply.confirm_buy(),
     )
 
-@dp.message_handler(state=BuyInvest.confirm_buy, text=_("Подтвердить покупку"))
+@dp.message_handler(state=BuyInvest.confirm_buy, text=_("Подтвердить"))
 async def confirm_buy(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         amount = data['amount']

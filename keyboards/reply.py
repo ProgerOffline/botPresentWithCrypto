@@ -82,7 +82,7 @@ def confirm_buy():
         row_width=1,
     ).add(
         types.KeyboardButton(
-            text=_("Подтвердить покупку"),
+            text=_("Подтвердить"),
         ),
         types.KeyboardButton(
             text=_("Назад"),
