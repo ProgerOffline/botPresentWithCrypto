@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
 
+import re
 from gino import Gino
-from sqlalchemy import sql
-from sqlalchemy import (Column, String, Sequence, Integer, Float, Boolean)
+from sqlalchemy import (Column, String, Sequence, Integer, Float)
 from sqlalchemy.sql.sqltypes import BigInteger
 
 
@@ -23,13 +23,22 @@ class Account(db.Model):
     wallet_pm = Column(String)
     wallet_crypto = Column(String)
     auth_date = Column(String)
-    sponsor_id = Column(BigInteger)
+    referer_id = Column(BigInteger)
+    referer_income = Column(BigInteger)
 
 
-class InvestRecords(db.Model):
+class InvestRecord(db.Model):
     __tablename__ = "invest_records"
     id = Column(BigInteger, Sequence("invest_id_seq"), primary_key=True)
+    account_id = Column(BigInteger)
     user_id = Column(BigInteger)
     amount = Column(Float)
     date = Column(String)
     count_precent = Column(Integer)
+
+
+class Referer(db.Model):
+    __tablename__ = "referers"
+    id = Column(BigInteger, Sequence("referer_id_seq"), primary_key=True)
+    referer_id = Column(BigInteger)
+    account_id = Column(BigInteger)

@@ -32,6 +32,9 @@ def main_menu():
         resize_keyboard=True,
         row_width=1,
     ).row(
+        types.KeyboardButton(text=_("Foxverse")),
+        types.KeyboardButton(text=_("Профиль")),
+    ).row(
         types.KeyboardButton(text=_("Мой Баланс")),
         types.KeyboardButton(text=_("Пополнить баланс")),
     ).row(
@@ -44,7 +47,7 @@ def main_menu():
         types.KeyboardButton(text=_("Вывод средств")),
         types.KeyboardButton(text=_("Вывод тела депозита")),
     ).row(
-        types.KeyboardButton(text=_("Профиль")),
+        types.KeyboardButton(text=_("NFT")),
         types.KeyboardButton(text=_("Поддержка")),
     ).row(
         types.KeyboardButton(text=_("Выход")),
@@ -87,4 +90,36 @@ def confirm_buy():
         types.KeyboardButton(
             text=_("Назад"),
         )
+    )
+
+
+def referal_program():
+    return types.ReplyKeyboardMarkup(
+        resize_keyboard=True,
+        row_width=1,
+    ).add(
+        types.KeyboardButton(
+            text=_("Моя структура"),
+        ),
+        types.KeyboardButton(
+            text=_("Назад"),
+        )
+    )
+
+
+def nft_menu():
+    return types.ReplyKeyboardMarkup(
+        resize_keyboard=True,
+        row_width=1,
+    ).row(
+        types.KeyboardButton(
+            text=_("NFT Self-Minting"),
+        ),
+        types.KeyboardButton(
+            text=_("NFT Market"),
+        ),
+    ).add(
+        types.KeyboardButton(
+            text=_("Назад"),
+        ),
     )

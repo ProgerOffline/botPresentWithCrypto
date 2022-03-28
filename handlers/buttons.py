@@ -1,15 +1,20 @@
-from sqlalchemy import util
-
-
 # -*- coding: utf-8 -*-
 
 from aiogram import types
-from aiogram.dispatcher import FSMContext
-from loader import dp, _
+from loader import dp, bot, _
 
 from keyboards import reply, inline
-from database import account_api, invest_api
-from statesgroup import BuyInvest, ToUpBallance
+from database import account_api, invest_api, referer_api
+from statesgroup import BuyInvest, ToUpBallance, NFT
+
+
+@dp.message_handler(text=_("Foxverse"))
+async def show_foxverse(message: types.Message):
+    await message.answer(
+        text="FOXVERSE is a next generation metaverse platform" +\
+             "by Hong Kong based Neowiz Play Studio Hong Kong Limited.",
+        reply_markup=inline.foxverse_menu()
+    )
 
 
 @dp.message_handler(text=_("Мой Баланс"))
@@ -24,22 +29,22 @@ async def show_ballance(message: types.Message):
 @dp.message_handler(text=_("Профиль"))
 async def show_account(message: types.Message):
     account = await account_api.get_account(message.from_user.id)
-    account.sponsor_id = "Нет спонсора" \
-        if account.sponsor_id == 0 \
-        else account.sponsor_id
+    account.referer_id = "Нет спонсора" \
+        if account.referer_id == 0 \
+        else account.referer_id
 
     await message.answer(
         text=_(
             f"Имя: {account.first_name}\n" +\
             f"Фамилия: {account.last_name}\n" +\
             f"ID: {account.id}\n" +\
-            f"ID Спонсора: {account.sponsor_id} \n" +\
+            f"ID Спонсора: {account.referer_id} \n" +\
             f"Кошелек: {account.wallet}\n" +\
             f"Кошелек PM: {account.wallet_pm}\n" +\
             f"Кошелек BTC: {account.wallet_crypto}\n" +\
             f"Дата регистрации: {account.auth_date}\n"
         ),
-        reply_markup=reply.back_to_menu(),
+        reply_markup=reply.main_menu(),
     )
 
 
@@ -63,11 +68,29 @@ async def invest_product(message: types.Message):
     )
 
 
+@dp.message_handler(text=_("NFT"))
+async def buy_invest(message: types.Message):
+    await message.answer(
+        text=_("🗃 Выберите раздел"),
+        reply_markup=reply.nft_menu(),
+    )
+
+
 @dp.message_handler(text=_("Купить"))
 async def buy_invest(message: types.Message):
     await BuyInvest.get_amount.set()
     await message.answer(
         text=_("💵 Введите сумму инвестиции в USD"),
+        reply_markup=reply.back_to_menu(),
+    )
+
+
+@dp.message_handler(text=_("NFT Self-Minting"))
+@dp.message_handler(text=_("NFT Market"))
+async def show_nft_menu(message: types.Message):
+    await NFT.back_to_nft_menu.set()
+    await message.answer(
+        text=_("🔜 Will be available in Q2 2022"),
         reply_markup=reply.back_to_menu(),
     )
 
@@ -120,6 +143,58 @@ async def show_invest_list(message: types.Message):
 
     await message.answer(
         text="\n".join(content),
+    )
+
+
+@dp.message_handler(text=_("Реферальная программа"))
+async def referal_program(message: types.Message):
+    invest_records = await invest_api.get_user_records(message.from_user.id)
+
+    if len(invest_records) <= 0:
+        await message.answer(
+            text=_(
+                "⚠️ Чтобы получить возможность получать доход от рефералов, " +\
+                "вам необходимо приобрести инвестиционный продукт"
+            ),
+        )
+        return
+    
+    bot_info = await bot.get_me()
+    account = await account_api.get_account(message.from_user.id)
+    await message.answer(
+        text=_(
+            "🔗 Ваша реферальная ссылка: https://t.me/" + \
+            f"{bot_info.username}?start=referer_{account.id}",
+        ),
+        reply_markup=reply.referal_program(),
+    )
+
+
+@dp.message_handler(text=_("Моя структура"))
+async def show_referal_structure(message: types.Message):
+    account = await account_api.get_account(message.from_user.id)
+    account_referers = await referer_api.get_all_referers(
+        account_id=account.id,
+    )
+
+    account_active_referers = await referer_api.get_all_referers(
+        account_id=account.id,
+        only_active=True,
+    )
+
+    amount_referers_investition = await referer_api.get_amount_investition(
+        referers=account_active_referers,
+    )
+
+    await message.answer(
+        text=_(
+            f"📈 Ваша структура\n" + \
+            f"Рефералов: {len(account_referers)}\n" +\
+            f"Активных рефералов: {len(account_active_referers)}\n" +\
+            f"Всего оборот: {amount_referers_investition} USD\n" +\
+            f"Доход: {account.referer_income} USD\n" 
+        ),
+        reply_markup=inline.referers_levels(),
     )
 
 

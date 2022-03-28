@@ -16,3 +16,11 @@ class ToUpBallance(StatesGroup):
 
 class OutInvest(StatesGroup):
     confirm_out = State()
+
+
+class Authorization(StatesGroup):
+    get_contact = State()
+
+
+class NFT(StatesGroup):
+    back_to_nft_menu = State()

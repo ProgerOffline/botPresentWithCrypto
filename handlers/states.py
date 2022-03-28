@@ -5,16 +5,25 @@ from aiogram import types
 from aiogram.dispatcher import FSMContext
 
 from loader import dp, _
-from database import account_api, invest_api
-from statesgroup import BuyInvest, OutInvest, ToUpBallance
+from database import account_api, invest_api, referer_api
+from statesgroup import BuyInvest, OutInvest, ToUpBallance, NFT
 from keyboards import reply
+
+
+@dp.message_handler(text=_("Назад"), state=NFT.back_to_nft_menu)
+async def back_to_nft_menu(message: types.Message, state: FSMContext):
+    await state.finish()
+    await message.answer(
+        text=_("🗃 Выберите раздел"),
+        reply_markup=reply.nft_menu(),
+    )
 
 
 @dp.message_handler(text=_("Назад"), state='*')
 async def back_to_menu(message: types.Message, state: FSMContext):
     await state.finish()
     await message.answer(
-        text=_("💻 Добро пожаловать в личный кабинет"),
+        text=_("🗃 Выберите раздел"),
         reply_markup=reply.main_menu(),
     )
 
@@ -89,13 +98,18 @@ async def confirm_buy(message: types.Message, state: FSMContext):
 
     account = await account_api.get_account(message.from_user.id)
     await account_api.update_ballance(
-        user_id=account.user_id, 
+        user_id=account.user_id,
         new_amount=account.ballance - amount,
     )
     await invest_api.create_record(
         user_id=message.from_user.id,
         amount=amount
     )
+
+    referer = await referer_api.get_account_referer(account.id)
+    if referer.referer_id != 0:
+        await referer_api.pay_referers_system(referer.referer_id, amount)
+
     await message.answer(
         text=_(
             "✅ Инвестиционный продукт успешно оплачен. " +\
